@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escala de Folgas 5x2 — MEGA SVC SSP52</title>
+<style>
+  :root {
+    --navy: #1E2A6E;
+    --navy-dark: #141C54;
+    --white: #ffffff;
+    --gray-bg: #F0F2F8;
+    --gray-light: #E8EAF2;
+    --gray-text: #666B8A;
+    --gray-muted: #9CA3C0;
+    --text-dark: #1A1D35;
+    --radius-sm: 8px;
+    --radius-md: 14px;
+    --radius-lg: 20px;
+    --color-A: #FF6B8A; --bg-A: #FFF0F3; --light-A: #FFD6E0;
+    --color-B: #F5A623; --bg-B: #FFF8EC; --light-B: #FFE9C0;
+    --color-C: #17B8A6; --bg-C: #E8FAF8; --light-C: #B8F0EA;
+    --color-D: #7C5CBF; --bg-D: #F2EEFF; --light-D: #D9CCEF;
+    --shadow: 0 2px 12px rgba(30,42,110,0.10);
+    --shadow-lg: 0 8px 32px rgba(30,42,110,0.14);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--gray-bg); color: var(--text-dark); min-height: 100vh; }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 0 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.25);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .header-icon { width: 36px; height: 36px; background: rgba(255,255,255,0.15); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .header-title { color: white; }
+  .header-title h1 { font-size: 15px; font-weight: 700; letter-spacing: 0.3px; }
+  .header-title p { font-size: 11px; color: rgba(255,255,255,0.65); margin-top: 1px; }
+  .header-right { display: flex; align-items: center; gap: 8px; }
+  .brand-badge { text-align: right; color: white; }
+  .brand-badge .brand-name { font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+  .brand-badge .brand-sub { font-size: 10px; color: rgba(255,255,255,0.6); }
+  .icon-btn { width: 36px; height: 36px; background: rgba(255,255,255,0.12); border: none; border-radius: 9px; color: white; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .icon-btn:hover { background: rgba(255,255,255,0.22); }
+
+  /* NAV TABS */
+  .nav-bar { background: var(--navy-dark); display: flex; justify-content: center; gap: 4px; padding: 8px 16px; }
+  .nav-tab { background: transparent; border: none; color: rgba(255,255,255,0.55); font-size: 12px; font-weight: 600; padding: 7px 18px; border-radius: 20px; cursor: pointer; transition: all 0.2s; letter-spacing: 0.4px; text-transform: uppercase; }
+  .nav-tab.active { background: rgba(255,255,255,0.18); color: white; }
+  .nav-tab:hover:not(.active) { color: rgba(255,255,255,0.8); }
+
+  /* TURNO SELECTOR */
+  .turno-bar { background: white; border-bottom: 1px solid var(--gray-light); display: flex; justify-content: center; gap: 8px; padding: 10px 16px; }
+  .turno-btn { background: var(--gray-bg); border: 1.5px solid transparent; border-radius: 20px; color: var(--gray-text); font-size: 11px; font-weight: 600; padding: 6px 14px; cursor: pointer; transition: all 0.2s; }
+  .turno-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  /* MAIN */
+  main { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+  /* TURMAS */
+  .section-label { font-size: 11px; font-weight: 700; color: var(--navy); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; }
+  .turmas-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .turma-card {
+    border-radius: var(--radius-md); padding: 14px 16px;
+    cursor: pointer; border: 2px solid transparent;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 0.2s; font-weight: 600; font-size: 14px;
+  }
+  .turma-card .dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; }
+  .turma-card.A { background: var(--bg-A); color: var(--color-A); }
+  .turma-card.B { background: var(--bg-B); color: var(--color-B); }
+  .turma-card.C { background: var(--bg-C); color: var(--color-C); }
+  .turma-card.D { background: var(--bg-D); color: var(--color-D); }
+  .turma-card.A .dot { background: var(--color-A); }
+  .turma-card.B .dot { background: var(--color-B); }
+  .turma-card.C .dot { background: var(--color-C); }
+  .turma-card.D .dot { background: var(--color-D); }
+  .turma-card.selected.A { border-color: var(--color-A); box-shadow: 0 0 0 3px rgba(255,107,138,0.18); }
+  .turma-card.selected.B { border-color: var(--color-B); box-shadow: 0 0 0 3px rgba(245,166,35,0.18); }
+  .turma-card.selected.C { border-color: var(--color-C); box-shadow: 0 0 0 3px rgba(23,184,166,0.18); }
+  .turma-card.selected.D { border-color: var(--color-D); box-shadow: 0 0 0 3px rgba(124,92,191,0.18); }
+  .turma-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 4px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-text); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* PRÓXIMAS FOLGAS */
+  .proximas-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .proximas-count { font-size: 11px; color: var(--gray-muted); }
+  .proximas-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; -ms-overflow-style: none; margin-bottom: 20px; }
+  .proximas-scroll::-webkit-scrollbar { display: none; }
+  .folga-chip {
+    flex-shrink: 0; width: 58px; text-align: center;
+    background: white; border-radius: var(--radius-sm);
+    padding: 8px 4px; box-shadow: var(--shadow);
+    border-top: 3px solid var(--color-A);
+    cursor: default;
+  }
+  .folga-chip .dia-num { font-size: 20px; font-weight: 800; line-height: 1; }
+  .folga-chip .dia-sem { font-size: 9px; font-weight: 600; color: var(--gray-muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .folga-chip .dia-mes { font-size: 9px; color: var(--gray-muted); margin-top: 1px; text-transform: uppercase; }
+
+  /* CALENDÁRIO MENSAL */
+  .cal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .cal-nav { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--navy); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .cal-nav:hover { background: var(--gray-light); }
+  .cal-month-label { font-size: 16px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 0.5px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+  .cal-dow { text-align: center; font-size: 10px; font-weight: 700; color: var(--gray-muted); padding: 4px 0; letter-spacing: 0.5px; text-transform: uppercase; }
+  .cal-day {
+    aspect-ratio: 1; border-radius: var(--radius-sm);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500; position: relative;
+    background: white; cursor: default; transition: all 0.15s;
+    min-height: 40px;
+  }
+  .cal-day.empty { background: transparent; }
+  .cal-day.other-month { opacity: 0.3; }
+  .cal-day .day-num { font-size: 13px; font-weight: 600; line-height: 1; }
+  .cal-day .day-status { font-size: 8px; font-weight: 700; margin-top: 2px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .cal-day.folga { }
+  .cal-day.folga.A { background: var(--bg-A); }
+  .cal-day.folga.B { background: var(--bg-B); }
+  .cal-day.folga.C { background: var(--bg-C); }
+  .cal-day.folga.D { background: var(--bg-D); }
+  .cal-day.folga .day-num { color: inherit; }
+  .cal-day.folga.A .day-num, .cal-day.folga.A .day-status { color: var(--color-A); }
+  .cal-day.folga.B .day-num, .cal-day.folga.B .day-status { color: var(--color-B); }
+  .cal-day.folga.C .day-num, .cal-day.folga.C .day-status { color: var(--color-C); }
+  .cal-day.folga.D .day-num, .cal-day.folga.D .day-status { color: var(--color-D); }
+  .cal-day.trabalhando .day-num { color: var(--gray-text); }
+  .cal-day.trabalhando .day-status { color: var(--gray-muted); }
+  .cal-day.hoje { outline: 2.5px solid var(--navy); outline-offset: -2px; }
+  .cal-day.domingo .day-num { color: #CC3333 !important; }
+  .cal-day.inactive { background: var(--gray-bg); opacity: 0.5; }
+
+  /* Modo: mostrar todas as turmas */
+  .all-turmas-dots { display: flex; gap: 2px; margin-top: 3px; flex-wrap: wrap; justify-content: center; }
+  .all-dot { width: 5px; height: 5px; border-radius: 50%; }
+
+  /* CALENDÁRIO SEMANAL */
+  .week-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .week-day-col { background: white; border-radius: var(--radius-md); overflow: hidden; box-shadow: var(--shadow); }
+  .week-day-header { padding: 10px 6px; text-align: center; background: var(--navy); color: white; }
+  .week-day-header .wdh-dow { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; opacity: 0.7; }
+  .week-day-header .wdh-num { font-size: 18px; font-weight: 800; }
+  .week-day-header .wdh-mes { font-size: 9px; opacity: 0.6; text-transform: uppercase; }
+  .week-day-col.hoje-col .week-day-header { background: var(--color-A); }
+  .week-turma-row { padding: 8px 6px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--gray-bg); }
+  .week-turma-row:last-child { border-bottom: none; }
+  .week-turma-label { font-size: 9px; font-weight: 700; width: 14px; }
+  .week-status-pill { flex: 1; border-radius: 4px; text-align: center; font-size: 8px; font-weight: 700; padding: 3px 2px; letter-spacing: 0.3px; text-transform: uppercase; }
+  .week-status-pill.F-A { background: var(--bg-A); color: var(--color-A); }
+  .week-status-pill.F-B { background: var(--bg-B); color: var(--color-B); }
+  .week-status-pill.F-C { background: var(--bg-C); color: var(--color-C); }
+  .week-status-pill.F-D { background: var(--bg-D); color: var(--color-D); }
+  .week-status-pill.T { background: var(--gray-bg); color: var(--gray-muted); }
+  .week-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .week-nav-label { font-size: 14px; font-weight: 700; color: var(--navy); }
+
+  /* CALENDÁRIO ANUAL */
+  .year-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .year-month { background: white; border-radius: var(--radius-md); box-shadow: var(--shadow); overflow: hidden; }
+  .year-month-header { background: var(--navy); color: white; text-align: center; padding: 8px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+  .year-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; padding: 6px; }
+  .year-dow { text-align: center; font-size: 7px; font-weight: 700; color: var(--gray-muted); padding: 2px 0; }
+  .year-day { aspect-ratio: 1; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 500; color: var(--gray-text); }
+  .year-day.folga.A { background: var(--light-A); color: var(--color-A); font-weight: 700; }
+  .year-day.folga.B { background: var(--light-B); color: var(--color-B); font-weight: 700; }
+  .year-day.folga.C { background: var(--light-C); color: var(--color-C); font-weight: 700; }
+  .year-day.folga.D { background: var(--light-D); color: var(--color-D); font-weight: 700; }
+  .year-day.hoje { outline: 1.5px solid var(--navy); outline-offset: -1px; }
+  .year-day.empty { background: transparent; }
+  .year-day.domingo { color: #CC3333 !important; }
+  .year-day.folga.domingo { filter: brightness(0.95); }
+  .year-day.inactive { opacity: 0.25; }
+
+  /* LEGENDA INFERIOR */
+  .legend-bar { display: flex; gap: 14px; align-items: center; margin-top: 16px; flex-wrap: wrap; }
+  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray-text); }
+  .legend-sq { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* FOOTER */
+  footer { text-align: center; font-size: 10px; color: var(--gray-muted); padding: 20px 16px; letter-spacing: 0.5px; text-transform: uppercase; }
+
+  /* CARD WRAPPER */
+  .card { background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow); padding: 18px; margin-bottom: 18px; }
+
+  /* MODO ALL TURMAS */
+  .all-mode-note { font-size: 11px; color: var(--gray-text); background: var(--gray-bg); border-radius: 8px; padding: 6px 12px; text-align: center; margin-bottom: 12px; }
+
+  @media (max-width: 520px) {
+    .turmas-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .turma-card { padding: 12px; font-size: 13px; }
+    .cal-day { min-height: 36px; }
+    .cal-day .day-num { font-size: 12px; }
+    .cal-day .day-status { font-size: 7px; }
+    .year-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .week-grid { grid-template-columns: repeat(7, 1fr); gap: 3px; }
+    .week-day-header .wdh-num { font-size: 14px; }
+    .nav-tab { padding: 6px 12px; font-size: 11px; }
+    main { padding: 12px; }
+    .card { padding: 14px; }
+  }
+  @media (max-width: 360px) {
+    .year-grid { grid-template-columns: 1fr 1fr; }
+    .turno-btn { padding: 5px 10px; font-size: 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-icon">📅</div>
+    <div class="header-title">
+      <h1>Escala de Folgas 5x2</h1>
+      <p id="turma-selecionada-label">Turma A selecionada</p>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="brand-badge">
+      <div class="brand-name">MEGA SVC</div>
+      <div class="brand-sub">SÃO BERNARDO · SSP52</div>
+    </div>
+    <button class="icon-btn" onclick="toggleAllTurmas()" title="Ver todas as turmas">⊞</button>
+  </div>
+</header>
+
+<div class="nav-bar">
+  <button class="nav-tab active" onclick="setView('mensal')">Mensal</button>
+  <button class="nav-tab" onclick="setView('semanal')">Semanal</button>
+  <button class="nav-tab" onclick="setView('anual')">Anual</button>
+</div>
+
+<div class="turno-bar">
+  <button class="turno-btn active" onclick="setTurno('T1')">T1 · 07h–16h48</button>
+  <button class="turno-btn" onclick="setTurno('T2')">T2 · 14h–23h36</button>
+  <button class="turno-btn" onclick="setTurno('T3')">T3 · 23h–07h50</button>
+</div>
+
+<main>
+
+  <!-- MINHA TURMA -->
+  <div class="card" id="card-turmas">
+    <div class="section-label">Minha turma</div>
+    <div class="turmas-grid">
+      <div class="turma-card A selected" onclick="setTurma('A')"><span class="dot"></span>Turma A</div>
+      <div class="turma-card B" onclick="setTurma('B')"><span class="dot"></span>Turma B</div>
+      <div class="turma-card C" onclick="setTurma('C')"><span class="dot"></span>Turma C</div>
+      <div class="turma-card D" onclick="setTurma('D')"><span class="dot"></span>Turma D</div>
+    </div>
+    <div class="turma-legend">
+      <div class="leg-item"><div class="leg-dot" style="background:var(--color-A)"></div>Turma A</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--color-B)"></div>Turma B</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--color-C)"></div>Turma C</div>
+      <div class="leg-item"><div class="leg-dot" style="background:var(--color-D)"></div>Turma D</div>
+    </div>
+  </div>
+
+  <!-- PRÓXIMAS FOLGAS -->
+  <div class="card" id="card-proximas">
+    <div class="proximas-header">
+      <div class="section-label" style="margin:0">Próximas folgas</div>
+      <div class="proximas-count" id="proximas-count">próximas 8</div>
+    </div>
+    <div class="proximas-scroll" id="proximas-scroll"></div>
+  </div>
+
+  <!-- CALENDÁRIO -->
+  <div class="card" id="card-cal">
+    <!-- MENSAL -->
+    <div id="view-mensal">
+      <div class="cal-header">
+        <button class="cal-nav" onclick="navMes(-1)">‹</button>
+        <div class="cal-month-label" id="cal-month-label"></div>
+        <button class="cal-nav" onclick="navMes(1)">›</button>
+      </div>
+      <div id="all-mode-note" class="all-mode-note" style="display:none">Mostrando todas as turmas — pontos coloridos indicam quem está de folga</div>
+      <div class="cal-grid" id="cal-grid-mensal"></div>
+      <div class="legend-bar">
+        <div class="legend-item"><div class="legend-sq" style="background:var(--bg-A);border:1.5px solid var(--color-A)"></div>Folga</div>
+        <div class="legend-item"><div class="legend-sq" style="background:white;border:1.5px solid #ddd"></div>Trabalha</div>
+        <div class="legend-item"><div class="legend-sq" style="outline:2px solid var(--navy);outline-offset:-1px;border-radius:3px"></div>Hoje</div>
+      </div>
+    </div>
+
+    <!-- SEMANAL -->
+    <div id="view-semanal" style="display:none">
+      <div class="week-nav">
+        <button class="cal-nav" onclick="navSemana(-1)">‹</button>
+        <div class="week-nav-label" id="week-nav-label"></div>
+        <button class="cal-nav" onclick="navSemana(1)">›</button>
+      </div>
+      <div class="week-grid" id="week-grid"></div>
+      <div class="legend-bar" style="margin-top:12px">
+        <div class="legend-item"><div class="legend-sq" style="background:var(--bg-A);border:1.5px solid var(--color-A)"></div>Folga</div>
+        <div class="legend-item"><div class="legend-sq" style="background:var(--gray-bg)"></div>Trabalha</div>
+      </div>
+    </div>
+
+    <!-- ANUAL -->
+    <div id="view-anual" style="display:none">
+      <div class="section-label" style="margin-bottom:14px">Calendário 2026 — Turma <span id="anual-turma-label">A</span></div>
+      <div id="all-mode-note-anual" class="all-mode-note" style="display:none">Mostrando todas as turmas — pontos coloridos indicam quem folga</div>
+      <div class="year-grid" id="year-grid"></div>
+      <div class="legend-bar" style="margin-top:4px">
+        <div class="legend-item"><div class="legend-sq" style="background:var(--light-A)"></div>Folga A</div>
+        <div class="legend-item"><div class="legend-sq" style="background:var(--light-B)"></div>Folga B</div>
+        <div class="legend-item"><div class="legend-sq" style="background:var(--light-C)"></div>Folga C</div>
+        <div class="legend-item"><div class="legend-sq" style="background:var(--light-D)"></div>Folga D</div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>Escala 5x2 · Gerado a partir da planilha de turnos · 4 turmas · Ciclo de 28 dias</footer>
+
+<script>
+// ===================== DADOS =====================
+const ESCALA = {"2026-07-01":{"A":"T","B":"T","C":"T","D":"T"},"2026-07-02":{"A":"F","B":"F","C":"T","D":"T"},"2026-07-03":{"A":"T","B":"F","C":"T","D":"T"},"2026-07-04":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-05":{"A":"T","B":"T","C":"F","D":"F"},"2026-07-06":{"A":"F","B":"T","C":"T","D":"T"},"2026-07-07":{"A":"T","B":"F","C":"T","D":"T"},"2026-07-08":{"A":"T","B":"F","C":"T","D":"T"},"2026-07-09":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-10":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-11":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-12":{"A":"F","B":"T","C":"T","D":"F"},"2026-07-13":{"A":"T","B":"F","C":"T","D":"T"},"2026-07-14":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-15":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-16":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-17":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-18":{"A":"F","B":"T","C":"T","D":"T"},"2026-07-19":{"A":"F","B":"F","C":"T","D":"T"},"2026-07-20":{"A":"T","B":"T","C":"F","D":"T"},"2026-07-21":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-22":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-23":{"A":"F","B":"T","C":"T","D":"T"},"2026-07-24":{"A":"F","B":"T","C":"T","D":"T"},"2026-07-25":{"A":"T","B":"F","C":"T","D":"T"},"2026-07-26":{"A":"T","B":"F","C":"F","D":"T"},"2026-07-27":{"A":"T","B":"T","C":"T","D":"F"},"2026-07-28":{"A":"F","B":"T","C":"T","D":"T"},"2026-07-29":{"A":"T","B":"T","C":"T","D":"T"},"2026-07-30":{"A":"F","B":"F","C":"T","D":"T"},"2026-07-31":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-01":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-02":{"A":"T","B":"T","C":"F","D":"F"},"2026-08-03":{"A":"F","B":"T","C":"T","D":"T"},"2026-08-04":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-05":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-06":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-07":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-08":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-09":{"A":"F","B":"T","C":"T","D":"F"},"2026-08-10":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-11":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-12":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-13":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-14":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-15":{"A":"F","B":"T","C":"T","D":"T"},"2026-08-16":{"A":"F","B":"F","C":"T","D":"T"},"2026-08-17":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-18":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-19":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-20":{"A":"F","B":"T","C":"T","D":"T"},"2026-08-21":{"A":"F","B":"T","C":"T","D":"T"},"2026-08-22":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-23":{"A":"T","B":"F","C":"F","D":"T"},"2026-08-24":{"A":"T","B":"T","C":"T","D":"F"},"2026-08-25":{"A":"F","B":"T","C":"T","D":"T"},"2026-08-26":{"A":"T","B":"T","C":"T","D":"T"},"2026-08-27":{"A":"F","B":"F","C":"T","D":"T"},"2026-08-28":{"A":"T","B":"F","C":"T","D":"T"},"2026-08-29":{"A":"T","B":"T","C":"F","D":"T"},"2026-08-30":{"A":"T","B":"T","C":"F","D":"F"},"2026-08-31":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-01":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-02":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-03":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-04":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-05":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-06":{"A":"F","B":"T","C":"T","D":"F"},"2026-09-07":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-08":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-09":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-10":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-11":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-12":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-13":{"A":"F","B":"F","C":"T","D":"T"},"2026-09-14":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-15":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-16":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-17":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-18":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-19":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-20":{"A":"T","B":"F","C":"F","D":"T"},"2026-09-21":{"A":"T","B":"T","C":"T","D":"F"},"2026-09-22":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-23":{"A":"T","B":"T","C":"T","D":"T"},"2026-09-24":{"A":"F","B":"F","C":"T","D":"T"},"2026-09-25":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-26":{"A":"T","B":"T","C":"F","D":"T"},"2026-09-27":{"A":"T","B":"T","C":"F","D":"F"},"2026-09-28":{"A":"F","B":"T","C":"T","D":"T"},"2026-09-29":{"A":"T","B":"F","C":"T","D":"T"},"2026-09-30":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-01":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-02":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-03":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-04":{"A":"F","B":"T","C":"T","D":"F"},"2026-10-05":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-06":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-07":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-08":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-09":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-10":{"A":"F","B":"T","C":"T","D":"T"},"2026-10-11":{"A":"F","B":"F","C":"T","D":"T"},"2026-10-12":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-13":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-14":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-15":{"A":"F","B":"T","C":"T","D":"T"},"2026-10-16":{"A":"F","B":"T","C":"T","D":"T"},"2026-10-17":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-18":{"A":"T","B":"F","C":"F","D":"T"},"2026-10-19":{"A":"T","B":"T","C":"T","D":"F"},"2026-10-20":{"A":"F","B":"T","C":"T","D":"T"},"2026-10-21":{"A":"T","B":"T","C":"T","D":"T"},"2026-10-22":{"A":"F","B":"F","C":"T","D":"T"},"2026-10-23":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-24":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-25":{"A":"T","B":"T","C":"F","D":"F"},"2026-10-26":{"A":"F","B":"T","C":"T","D":"T"},"2026-10-27":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-28":{"A":"T","B":"F","C":"T","D":"T"},"2026-10-29":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-30":{"A":"T","B":"T","C":"F","D":"T"},"2026-10-31":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-01":{"A":"F","B":"T","C":"T","D":"F"},"2026-11-02":{"A":"T","B":"F","C":"T","D":"T"},"2026-11-03":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-04":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-05":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-06":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-07":{"A":"F","B":"T","C":"T","D":"T"},"2026-11-08":{"A":"F","B":"F","C":"T","D":"T"},"2026-11-09":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-10":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-11":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-12":{"A":"F","B":"T","C":"T","D":"T"},"2026-11-13":{"A":"F","B":"T","C":"T","D":"T"},"2026-11-14":{"A":"T","B":"F","C":"T","D":"T"},"2026-11-15":{"A":"T","B":"F","C":"F","D":"T"},"2026-11-16":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-17":{"A":"F","B":"T","C":"T","D":"T"},"2026-11-18":{"A":"T","B":"T","C":"T","D":"T"},"2026-11-19":{"A":"F","B":"F","C":"T","D":"T"},"2026-11-20":{"A":"T","B":"F","C":"T","D":"T"},"2026-11-21":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-22":{"A":"T","B":"T","C":"F","D":"F"},"2026-11-23":{"A":"F","B":"T","C":"T","D":"T"},"2026-11-24":{"A":"T","B":"F","C":"T","D":"T"},"2026-11-25":{"A":"T","B":"F","C":"T","D":"T"},"2026-11-26":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-27":{"A":"T","B":"T","C":"F","D":"T"},"2026-11-28":{"A":"T","B":"T","C":"T","D":"F"},"2026-11-29":{"A":"F","B":"T","C":"T","D":"F"},"2026-11-30":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-01":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-02":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-03":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-04":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-05":{"A":"F","B":"T","C":"T","D":"T"},"2026-12-06":{"A":"F","B":"F","C":"T","D":"T"},"2026-12-07":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-08":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-09":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-10":{"A":"F","B":"T","C":"T","D":"T"},"2026-12-11":{"A":"F","B":"T","C":"T","D":"T"},"2026-12-12":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-13":{"A":"T","B":"F","C":"F","D":"T"},"2026-12-14":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-15":{"A":"F","B":"T","C":"T","D":"T"},"2026-12-16":{"A":"T","B":"T","C":"T","D":"T"},"2026-12-17":{"A":"F","B":"F","C":"T","D":"T"},"2026-12-18":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-19":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-20":{"A":"T","B":"T","C":"F","D":"F"},"2026-12-21":{"A":"F","B":"T","C":"T","D":"T"},"2026-12-22":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-23":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-24":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-25":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-26":{"A":"T","B":"T","C":"T","D":"F"},"2026-12-27":{"A":"F","B":"T","C":"T","D":"F"},"2026-12-28":{"A":"T","B":"F","C":"T","D":"T"},"2026-12-29":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-30":{"A":"T","B":"T","C":"F","D":"T"},"2026-12-31":{"A":"T","B":"T","C":"T","D":"F"}};
+
+const INICIOS = { T1:'2026-07-13', T2:'2026-07-13', T3:'2026-07-14' };
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const DIAS_SEMANA = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const CORES = { A:'var(--color-A)', B:'var(--color-B)', C:'var(--color-C)', D:'var(--color-D)' };
+
+// ===================== ESTADO =====================
+let turmaSel = 'A';
+let turnoSel = 'T1';
+let viewAtual = 'mensal';
+let mesAtual = new Date(2026, 6, 1); // julho 2026
+let semanaOffset = 0;
+let allTurmas = false;
+
+const hoje = new Date();
+const hojeStr = hoje.toISOString().slice(0,10);
+
+// ===================== UTILS =====================
+function fmtKey(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function getStatus(dateStr, turma) {
+  const ini = new Date(INICIOS[turnoSel]);
+  const d = new Date(dateStr);
+  if (d < ini) return 'inactive';
+  return (ESCALA[dateStr] && ESCALA[dateStr][turma] === 'F') ? 'F' : 'T';
+}
+
+// ===================== SELETORES =====================
+function setTurma(t) {
+  turmaSel = t;
+  allTurmas = false;
+  document.querySelectorAll('.turma-card').forEach(c => {
+    c.classList.toggle('selected', c.classList.contains(t));
+  });
+  document.getElementById('turma-selecionada-label').textContent = `Turma ${t} selecionada`;
+  document.getElementById('anual-turma-label').textContent = t;
+  document.getElementById('all-mode-note').style.display = 'none';
+  document.getElementById('all-mode-note-anual').style.display = 'none';
+  render();
+}
+
+function setTurno(t) {
+  turnoSel = t;
+  document.querySelectorAll('.turno-btn').forEach(b => b.classList.toggle('active', b.textContent.startsWith(t.replace('T','T'))));
+  document.querySelectorAll('.turno-btn').forEach((b,i) => b.classList.toggle('active', ['T1','T2','T3'][i]===t));
+  render();
+}
+
+function setView(v) {
+  viewAtual = v;
+  document.querySelectorAll('.nav-tab').forEach((b,i) => b.classList.toggle('active', ['mensal','semanal','anual'][i]===v));
+  document.getElementById('view-mensal').style.display = v==='mensal' ? '' : 'none';
+  document.getElementById('view-semanal').style.display = v==='semanal' ? '' : 'none';
+  document.getElementById('view-anual').style.display = v==='anual' ? '' : 'none';
+  document.getElementById('card-proximas').style.display = v==='anual' ? 'none' : '';
+  render();
+}
+
+function toggleAllTurmas() {
+  allTurmas = !allTurmas;
+  document.getElementById('all-mode-note').style.display = allTurmas ? '' : 'none';
+  document.getElementById('all-mode-note-anual').style.display = allTurmas ? '' : 'none';
+  render();
+}
+
+// ===================== PRÓXIMAS FOLGAS =====================
+function renderProximas() {
+  const cont = document.getElementById('proximas-scroll');
+  cont.innerHTML = '';
+  const turma = turmaSel;
+  const color = CORES[turma];
+  let count = 0;
+  const ini = new Date(INICIOS[turnoSel]);
+
+  for (let i = 0; i < 120 && count < 8; i++) {
+    const d = new Date(hoje); d.setDate(hoje.getDate() + i);
+    if (d < ini) continue;
+    const key = fmtKey(d);
+    if (ESCALA[key] && ESCALA[key][turma] === 'F') {
+      const chip = document.createElement('div');
+      chip.className = 'folga-chip';
+      chip.style.borderTopColor = color;
+      const dow = DIAS_SEMANA[d.getDay()];
+      const mes = MESES[d.getMonth()].slice(0,3).toUpperCase();
+      chip.innerHTML = `<div class="dia-num" style="color:${color}">${d.getDate()}</div><div class="dia-sem">${dow}</div><div class="dia-mes">${mes}</div>`;
+      cont.appendChild(chip);
+      count++;
+    }
+  }
+  if (!count) cont.innerHTML = '<div style="color:var(--gray-muted);font-size:12px;padding:10px">Nenhuma folga encontrada</div>';
+}
+
+// ===================== MENSAL =====================
+function navMes(dir) {
+  mesAtual = new Date(mesAtual.getFullYear(), mesAtual.getMonth() + dir, 1);
+  renderMensal();
+}
+
+function renderMensal() {
+  const ano = mesAtual.getFullYear(), mes = mesAtual.getMonth();
+  document.getElementById('cal-month-label').textContent = `${MESES[mes].toUpperCase()} ${ano}`;
+  const grid = document.getElementById('cal-grid-mensal');
+  grid.innerHTML = '';
+  const dows = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+  dows.forEach(d => { const el = document.createElement('div'); el.className='cal-dow'; el.textContent=d; grid.appendChild(el); });
+
+  const primeiro = new Date(ano, mes, 1);
+  const startDow = primeiro.getDay();
+  for (let i = 0; i < startDow; i++) { const el=document.createElement('div'); el.className='cal-day empty'; grid.appendChild(el); }
+
+  const diasNoMes = new Date(ano, mes+1, 0).getDate();
+  const ini = new Date(INICIOS[turnoSel]);
+
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    const d = new Date(ano, mes, dia);
+    const key = fmtKey(d);
+    const dow = d.getDay();
+    const isHoje = key === hojeStr;
+    const isInactive = d < ini;
+    const isDom = dow === 0;
+
+    const cell = document.createElement('div');
+    cell.className = 'cal-day' + (isDom ? ' domingo' : '') + (isHoje ? ' hoje' : '');
+
+    if (isInactive) {
+      cell.classList.add('inactive');
+      cell.innerHTML = `<div class="day-num">${dia}</div>`;
+    } else if (allTurmas) {
+      const folgando = ['A','B','C','D'].filter(t => ESCALA[key] && ESCALA[key][t]==='F');
+      cell.classList.add('trabalhando');
+      cell.innerHTML = `<div class="day-num">${dia}</div>`;
+      if (folgando.length) {
+        const dots = document.createElement('div');
+        dots.className = 'all-turmas-dots';
+        folgando.forEach(t => {
+          const dot = document.createElement('div');
+          dot.className = 'all-dot';
+          dot.style.background = CORES[t];
+          dots.appendChild(dot);
+        });
+        cell.appendChild(dots);
+      }
+    } else {
+      const st = getStatus(key, turmaSel);
+      if (st === 'F') {
+        cell.classList.add('folga', turmaSel);
+        cell.innerHTML = `<div class="day-num">${dia}</div><div class="day-status">Folga</div>`;
+      } else {
+        cell.classList.add('trabalhando');
+        cell.innerHTML = `<div class="day-num">${dia}</div><div class="day-status" style="color:var(--gray-muted)">Trab</div>`;
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+// ===================== SEMANAL =====================
+function navSemana(dir) { semanaOffset += dir; renderSemanal(); }
+
+function renderSemanal() {
+  const base = new Date(hoje);
+  base.setDate(hoje.getDate() - hoje.getDay() + semanaOffset * 7); // domingo
+  const fim = new Date(base); fim.setDate(base.getDate() + 6);
+  const label = `${base.getDate()}/${base.getMonth()+1} – ${fim.getDate()}/${fim.getMonth()+1}/${fim.getFullYear()}`;
+  document.getElementById('week-nav-label').textContent = label;
+
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = '';
+  const ini = new Date(INICIOS[turnoSel]);
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(base); d.setDate(base.getDate() + i);
+    const key = fmtKey(d);
+    const isHoje = key === hojeStr;
+    const isInactive = d < ini;
+    const dow = DIAS_SEMANA[d.getDay()];
+    const mes = MESES[d.getMonth()].slice(0,3).toUpperCase();
+
+    const col = document.createElement('div');
+    col.className = 'week-day-col' + (isHoje ? ' hoje-col' : '');
+
+    col.innerHTML = `<div class="week-day-header"><div class="wdh-dow">${dow}</div><div class="wdh-num">${d.getDate()}</div><div class="wdh-mes">${mes}</div></div>`;
+
+    const turmas = allTurmas ? ['A','B','C','D'] : [turmaSel];
+    turmas.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'week-turma-row';
+      if (allTurmas) row.innerHTML = `<span class="week-turma-label" style="color:${CORES[t]}">${t}</span>`;
+      const pill = document.createElement('div');
+      if (isInactive) {
+        pill.className = 'week-status-pill T';
+        pill.textContent = '—';
+      } else {
+        const st = ESCALA[key] && ESCALA[key][t]==='F' ? 'F' : 'T';
+        pill.className = `week-status-pill ${st==='F'?'F-'+t:'T'}`;
+        pill.textContent = st==='F' ? 'Folga' : 'Trab';
+      }
+      row.appendChild(pill);
+      col.appendChild(row);
+    });
+    grid.appendChild(col);
+  }
+}
+
+// ===================== ANUAL =====================
+function renderAnual() {
+  document.getElementById('anual-turma-label').textContent = allTurmas ? 'todas' : turmaSel;
+  const grid = document.getElementById('year-grid');
+  grid.innerHTML = '';
+  const ini = new Date(INICIOS[turnoSel]);
+
+  for (let m = 6; m <= 11; m++) { // julho a dezembro
+    const card = document.createElement('div');
+    card.className = 'year-month';
+    const hdr = document.createElement('div');
+    hdr.className = 'year-month-header';
+    hdr.textContent = `${MESES[m].toUpperCase()} 2026`;
+    card.appendChild(hdr);
+
+    const ycal = document.createElement('div');
+    ycal.className = 'year-cal-grid';
+    DIAS_SEMANA.forEach(d => {
+      const el = document.createElement('div'); el.className='year-dow'; el.textContent=d[0]; ycal.appendChild(el);
+    });
+
+    const primeiro = new Date(2026, m, 1);
+    for (let p = 0; p < primeiro.getDay(); p++) {
+      const el = document.createElement('div'); el.className='year-day empty'; ycal.appendChild(el);
+    }
+    const dias = new Date(2026, m+1, 0).getDate();
+    for (let dia = 1; dia <= dias; dia++) {
+      const d = new Date(2026, m, dia);
+      const key = fmtKey(d);
+      const isHoje = key === hojeStr;
+      const isInactive = d < ini;
+      const isDom = d.getDay() === 0;
+      const el = document.createElement('div');
+      el.className = 'year-day' + (isHoje?' hoje':'') + (isDom?' domingo':'') + (isInactive?' inactive':'');
+      el.textContent = dia;
+
+      if (!isInactive && allTurmas) {
+        const folgando = ['A','B','C','D'].filter(t => ESCALA[key] && ESCALA[key][t]==='F');
+        if (folgando.length) {
+          el.classList.add('folga', folgando[0]);
+          if (folgando.length > 1) el.style.background = `linear-gradient(135deg, var(--light-${folgando[0]}) 50%, var(--light-${folgando[1]}) 50%)`;
+        }
+      } else if (!isInactive) {
+        const st = ESCALA[key] && ESCALA[key][turmaSel]==='F' ? 'F' : 'T';
+        if (st === 'F') el.classList.add('folga', turmaSel);
+      }
+      ycal.appendChild(el);
+    }
+    card.appendChild(ycal);
+    grid.appendChild(card);
+  }
+}
+
+// ===================== RENDER PRINCIPAL =====================
+function render() {
+  renderProximas();
+  if (viewAtual === 'mensal') renderMensal();
+  else if (viewAtual === 'semanal') renderSemanal();
+  else renderAnual();
+}
+
+// Init
+render();
+</script>
+</body>
+</html>
